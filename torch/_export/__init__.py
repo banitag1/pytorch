@@ -397,11 +397,12 @@ def export(
             param_lookup[id(param)] = name
         for name, buffer in f.named_buffers():
             buffer_lookup[id(buffer)] = name
-        for dynamo_name, dynamo_param in gm_torch_level.named_parameters():
+        for dynamo_name, dynamo_param in gm_torch_level.named_parameters(remove_duplicate=False):
             assert dynamo_name not in param_buffer_table
             if id(dynamo_param) in param_lookup:
                 param_buffer_table[dynamo_name] = param_lookup[id(dynamo_param)]
-        for dynamo_name, dynamo_buffer in gm_torch_level.named_buffers():
+
+        for dynamo_name, dynamo_buffer in gm_torch_level.named_buffers(remove_duplicate=False):
             assert dynamo_name not in param_buffer_table
             if id(dynamo_buffer) in buffer_lookup:
                 param_buffer_table[dynamo_name] = buffer_lookup[id(dynamo_buffer)]
