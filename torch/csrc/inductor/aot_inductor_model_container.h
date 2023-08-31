@@ -5,6 +5,7 @@
 #include <shared_mutex>
 
 #include <torch/csrc/inductor/aot_inductor_model.h>
+#include <torch/csrc/inductor/proxy_executor.h>
 
 // At codegen time, we write out a binary file called constants.bin.
 // We then turn the raw binary to an object file that exposes this
@@ -125,12 +126,13 @@ class AOTInductorModelContainer {
   void run(
       const std::vector<at::Tensor>& inputs,
       std::vector<at::Tensor>& outputs,
-      cudaStream_t stream) {
+      cudaStream_t stream,
+      ProxyExecutor* proxy_executor) {
     auto* model = get_available_model();
     try {
       AOT_VECTOR_SIZE_CHECK(inputs, num_inputs());
       AOT_VECTOR_SIZE_CHECK(outputs, num_outputs());
-      model->run(inputs, outputs, stream);
+      model->run(inputs, outputs, stream, proxy_executor);
     } catch (...) {
       std::lock_guard lk(models_mutex_);
       available_models_.push_back(model);
