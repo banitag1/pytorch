@@ -374,7 +374,7 @@ class PT2EQuantizationTestCase(QuantizationTestCase):
         self.assertEqual(after_prepare_result_pt2e, after_prepare_result_fx)
 
         if verify_convert:
-            torch.ao.quantization.move_model_to_eval(model_pt2e)
+            torch.ao.quantization.pt2e.utils.move_model_to_eval(model_pt2e)
             model_pt2e = convert_pt2e(model_pt2e)
             quant_result_pt2e = model_pt2e(*example_inputs)
             model_fx.eval()
@@ -1285,7 +1285,7 @@ class TestQuantizePT2E(PT2EQuantizationTestCase):
         node_occurrence = {
             # two input and one output for first add, and output for second add
             torch.ops.quantized_decomposed.quantize_per_tensor.default: 4,
-            torch.ops.quantized_decomposed.dequantize_per_tensor.default: 4,
+            torch.ops.quantized_decomposed.dequantize_per_tensor.default: 5,
         }
         node_list = [
             torch.ops.quantized_decomposed.dequantize_per_tensor.default,
@@ -1312,7 +1312,7 @@ class TestQuantizePT2E(PT2EQuantizationTestCase):
         node_occurrence = {
             # two input and one output for first add, and output for second add
             torch.ops.quantized_decomposed.quantize_per_tensor.default: 4,
-            torch.ops.quantized_decomposed.dequantize_per_tensor.default: 4,
+            torch.ops.quantized_decomposed.dequantize_per_tensor.default: 5,
         }
         node_list = [
             torch.ops.quantized_decomposed.dequantize_per_tensor.default,
@@ -2393,7 +2393,7 @@ class TestQuantizePT2E(PT2EQuantizationTestCase):
         self.assertTrue(dropout_node.args[2])
 
         # Do the subgraph rewriting
-        torch.ao.quantization.move_model_to_eval(m)
+        torch.ao.quantization.pt2e.utils.move_model_to_eval(m)
 
         # Assert that dropout op is now replaced with a clone op
         targets = [n.target for n in m.graph.nodes]
