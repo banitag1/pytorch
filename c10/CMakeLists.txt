@@ -55,6 +55,12 @@ if(${COMPILER_SUPPORTS_HIDDEN_VISIBILITY})
   target_compile_options(c10 PRIVATE "-fvisibility=hidden")
 endif()
 
+if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0.0)
+    target_link_options(c10 PUBLIC "-lstdc++fs")
+  endif()
+endif()
+
 option(C10_USE_IWYU "Use include-what-you-use to clean up header inclusion" OFF)
 if(C10_USE_IWYU)
   find_program(iwyu NAMES include-what-you-use)
